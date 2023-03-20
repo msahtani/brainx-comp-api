@@ -66,6 +66,7 @@ app.post("/apply", async (req, res) => {
             email: req.body.member2Email,
             phone: req.body.member2Phone
         },
+        school: req.body.school,
         registedAt: new Date().toLocaleString()
     }
 
