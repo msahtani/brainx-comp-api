@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import fileUpload, { UploadedFile } from "express-fileupload";
 import cors from "cors";
 import morgan from "morgan";
-import { acceptTeam, addTeam, Team} from "./team_registration";
+import { acceptTeam, addTeam, Team} from "./teams";
 
 // Loads .env file contents into process.env.
 env.config()

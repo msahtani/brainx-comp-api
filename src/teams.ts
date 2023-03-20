@@ -90,7 +90,7 @@ export async function getTeams() {
     const teamCol = collection(db, "teams")
     const teamSnapshot = await getDocs(teamCol)
     const teamList = teamSnapshot.docs.map(
-        doc => doc.data()
+        doc => doc.id
     )
 
     return teamList
@@ -98,7 +98,7 @@ export async function getTeams() {
 
 export async function acceptTeam(ref: string) {
     
-    const docRef = doc(db, "registration", ref)
+    const docRef = doc(db, "teams", ref)
     
     getDoc(docRef).then(
         doc => {
@@ -118,3 +118,10 @@ export async function acceptTeam(ref: string) {
     )
 
 }
+
+
+getTeams().then(
+    res => console.log(res)
+).finally(
+    () => console.log("finished")
+)
