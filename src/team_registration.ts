@@ -22,6 +22,7 @@ export interface Team {
     teamLeader: Member
     member1: Member
     member2: Member
+    schoool: string
     readonly registedAt: string
     accepted?: boolean
     uploadedFiles?: string[]
