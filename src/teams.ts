@@ -1,4 +1,5 @@
 import { db } from "./firebase_r"
+import sendMail from "./email"
 import { 
     collection, 
     doc, 
@@ -10,15 +11,15 @@ import {
 import { generateId } from "./utils"
 import * as check from './utils'
 
-enum TShirtSize {
-    XS, // extra-small
-    S,  // small
-    M,  // medium
-    L,  // large
-    XL, // extra-large
-    XXL // double extra-large
-}
 
+enum TShirtSize {
+    XS  = "XS",
+    S   = "S",
+    M   = "M",
+    L   = "L",
+    XL  = "XL",  
+    XXL = "XXL"
+}
 
 type Member = {
     name: string
@@ -65,7 +66,15 @@ export async function addTeam(team: Team){
     team.accepted = false
 
     const docRef = doc(db, "teams", generateId())
-    setDoc(docRef, team)
+    setDoc(docRef, team).then(
+        _ => {
+            sendMail(
+                team.teamLeader.email,
+                "you're registed successfully",
+                "..."
+            )
+        }
+    ).catch(console.error)
 
 }
 
@@ -90,18 +99,25 @@ export async function acceptTeam(ref: string) {
     getDoc(docRef).then(
         doc => {
             if(!doc.exists()){
-                console.log("the team does not exists")
-                return
+                throw new Error("the team does not exists")
             }
-            
-            const teamName = doc.data()["name"]
 
-            updateDoc(docRef, {accepted:true}).then(
-                _ => console.log(`the team ${teamName} is accepted successfully`)
-            )
+            updateDoc(docRef, {accepted:true})
+            return ({
+                email: doc.data().teamLeader.email as string,
+                name:  doc.data().name             as string
+            })
         }
-    ).catch(
-        err => console.log(err)
-    )
+    ).then(
+        (v) => {
+            // TODO: we need a HTML template for a professional mailing
+            sendMail(
+                v!.email,
+                "you're acccepted ",
+                "..."
+            )
+            console.log(`the team ${v!.name} is accepted successfully`)
+        }
+    ).catch(console.error)
 
 }

@@ -10,16 +10,14 @@ export interface Contact {
     message:  string
 }
 
-
 // Get a list of contacts from the database
 export async function getContacts(){
     const contactCol = collection(db, 'contact')
     const contactSnapshot = await getDocs(contactCol)
-    const contactList = contactSnapshot.docs.map(
+
+    return contactSnapshot.docs.map(
         doc => doc.data()
     )
-
-    return contactList
 }
 
 // add the contact to the database
