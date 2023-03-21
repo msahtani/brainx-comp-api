@@ -1,17 +1,19 @@
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore';
-import { getStorage } from "firebase/storage";
+import env from "dotenv"
 
-  
+env.config()
+
+const e = process.env
+
 const app = initializeApp({
-    apiKey:            "AIzaSyCDhJlKAzNYWJ_4Lg54y-Ci4_cAEg9ERT0",
-    authDomain:        "brainx-comp.firebaseapp.com",
-    projectId:         "brainx-comp",
-    storageBucket:     "brainx-comp.appspot.com",
-    messagingSenderId: "389689288531",
-    appId:             "1:389689288531:web:bb8f6dc282e6b5c37e23a6",
-    measurementId:     "G-XH1P24TKLF"
+    apiKey:            e.F_API_KEY ,
+    authDomain:        e.F_AUTH_DOMAIN,
+    projectId:         e.F_PROJECT_ID,
+    storageBucket:     e.F_STORAGE_BUCKET,
+    messagingSenderId: e.F_MESSAGING_SENDER,
+    appId:             e.F_APP_ID,
+    measurementId:     e.F_MEASUREMENT_ID,
 })
 
 export const db      = getFirestore(app)
-export const storage = getStorage(app);
