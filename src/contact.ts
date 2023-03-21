@@ -1,9 +1,9 @@
-import { collection, getDocs } from 'firebase/firestore';
-import { doc, setDoc } from "firebase/firestore";
-import {db} from './firebase_r'
-import { generateId } from './utils';
+import { collection, getDocs } from 'firebase/firestore'
+import { doc, setDoc }         from "firebase/firestore"
+import { db }                  from './firebase_r'
+import { generateId }          from './utils'
 
-export interface Contact {
+export type Contact = {
     name:     string
     email:    string
     subject?: string
@@ -12,12 +12,16 @@ export interface Contact {
 
 // Get a list of contacts from the database
 export async function getContacts(){
-    const contactCol = collection(db, 'contact')
-    const contactSnapshot = await getDocs(contactCol)
-
-    return contactSnapshot.docs.map(
-        doc => doc.data()
+    
+    const contactSnapshot = await getDocs(
+        collection(db, 'contact')
     )
+    
+    return contactSnapshot
+        .docs
+        .map(
+            doc => doc.data()
+        )
 }
 
 // add the contact to the database
