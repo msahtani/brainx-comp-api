@@ -1,7 +1,7 @@
 import { collection, getDocs } from 'firebase/firestore';
 import { doc, setDoc } from "firebase/firestore";
 import {db} from './firebase_r'
-import { generateId } from './generate_id';
+import { generateId } from './utils';
 
 export interface Contact {
     name:     string
@@ -24,7 +24,7 @@ export async function getContacts(){
 
 // add the contact to the database
 export async function addContact(contact: Contact){
-    const docRef = doc(db, "contact", generateId(24))
+    const docRef = doc(db, "contact", generateId())
     setDoc(docRef, contact).then(
         () => console.log("added successfully")
     )

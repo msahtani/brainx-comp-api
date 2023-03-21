@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import fileUpload, { UploadedFile } from "express-fileupload";
 import cors from "cors";
 import morgan from "morgan";
-import { acceptTeam, addTeam, Team} from "./teams";
+import { acceptTeam, addTeam, getTeams, Team} from "./teams";
 
 // Loads .env file contents into process.env.
 env.config()
@@ -16,18 +16,16 @@ const PORT = process.env.PORT || 8080
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-// enable file uploading
 app.use(fileUpload({ createParentPath: true }))
 app.use(cors())
 app.use(morgan('dev'));
 
-// routes for contact
+/* ====== routes for contact ====== */
 app.get("/contact", async (req, res) => {
 
     // check the api key
-    if(
-        req.query.api_key != process.env.API_KEY
-    ) {
+    if(req.query.api_key != process.env.API_KEY) 
+    {
         res.sendStatus(403)
         return
     }
@@ -46,7 +44,7 @@ app.post("/contact", async (req, res) => {
 })
 
 
-// routes for team registration
+/* ====== routes for teams ====== */
 app.post("/apply", async (req, res) => {
 
     const team : Team = {
@@ -70,16 +68,12 @@ app.post("/apply", async (req, res) => {
         registedAt: new Date().toLocaleString()
     }
 
-    console.log(team)
-    
-
     // handle files uploads
     if(req.files){
-
         const files = req.files.attachments as UploadedFile[]
         
         team.uploadedFiles = files.map(
-            (file) => {
+            file => {
                 let tmpSplit = file.name.split(".")
                 const ext = tmpSplit[tmpSplit.length - 1]
                 const fileName = `${Date.now()}-${team.name}.${ext}`
@@ -87,29 +81,46 @@ app.post("/apply", async (req, res) => {
                 return fileName
             }
         )
-
     }
 
-     // register the team into the database
-     await addTeam(team)
+    // register the team into the database
+    await addTeam(team)
 
-     res.send("sent successfully")
-   
-
+    res.send("sent successfully")
 })
 
+app.put("/accept/:teamRef", async(req, res) => {
 
-app.post("/accept/:teamRef", async(req, res) => {
-    
+    // check the API key
+    if(req.query.api_key != process.env.API_KEY){
+        res.send("unauthorized").sendStatus(403)
+    }
+
     const ref = req.params.teamRef
 
     await acceptTeam(ref)
 
-    res.send("all is goood")
+    res.sendStatus(204)
+})
+
+app.get("/applied_teams", async (req, res) => {
+
+    if(req.query.api_key != process.env.API_KEY){
+        res.send("unauthorized").sendStatus(403)
+    }
+
+    res.send(
+        await getTeams()
+    )
+})
+
+app.get("/attachment", (req, res) => {
+    // res.download("./uploads/1679351164944-blackscreen.js")
+
 })
 
 
-
+/* ====== listen to the app ====== */
 app.listen(PORT, () => {
     console.log(
         `server started at http://localhost:${PORT}/`

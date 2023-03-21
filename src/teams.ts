@@ -7,17 +7,28 @@ import {
     setDoc,
     updateDoc 
 } from "firebase/firestore"
-import { generateId } from "./generate_id"
-import * as check from './checks'
+import { generateId } from "./utils"
+import * as check from './utils'
 
-interface Member {
-    name: string
-    email: string
-    phone: string
+enum TShirtSize {
+    XS, // extra-small
+    S,  // small
+    M,  // medium
+    L,  // large
+    XL, // extra-large
+    XXL // double extra-large
 }
 
 
-export interface Team { 
+type Member = {
+    name: string
+    email: string
+    phone: string
+    tshirtSize?: TShirtSize
+}
+
+
+export type Team = { 
     name: string
     teamLeader: Member
     member1: Member
@@ -28,51 +39,24 @@ export interface Team {
     uploadedFiles?: string[]
 }
 
-class MemberValidator{
 
-    #email: string
-    #phone: string
+function validateTeamInfo(team: Team){
 
-    constructor(member: Member){
-        this.#email = member.email
-        this.#phone = member.phone
+    function validateMemberInfo(member: Member){
+        return check.checkEmail(member.email)
+            && check.checkPhone(member.phone)
     }
 
-    validate(): boolean{
-        return check.checkEmail(this.#email)
-            && check.checkPhone(this.#phone)
-    }
-
-}
-
-class TeamValidator{
-
-    #mValidators: MemberValidator[]
-
-    constructor(team: Team) {
-        this.#mValidators = new Array<MemberValidator>()
-        this.#mValidators.push(
-            new MemberValidator(team.teamLeader),
-            new MemberValidator(team.member1),
-            new MemberValidator(team.member2)
-        )
-    }
-
-
-    validate(): boolean{
-        return this.#mValidators.reduce(
-            (b, m) => b && m.validate(), true
-        )
-    }
-
+    return validateMemberInfo(team.teamLeader)
+        && validateMemberInfo(team.member1)
+        && validateMemberInfo(team.member2)
 }
 
 
 export async function addTeam(team: Team){
 
     // check the info
-    const teamValidator = new TeamValidator(team)
-    if(!teamValidator.validate()){
+    if(!validateTeamInfo(team)){
         console.log("the info are invalid")
         return
     }
@@ -80,17 +64,20 @@ export async function addTeam(team: Team){
     // assign the default value `false` to the `accepted` attribute
     team.accepted = false
 
-
-    const docRef = doc(db, "registration", generateId())
+    const docRef = doc(db, "teams", generateId())
     setDoc(docRef, team)
 
 }
 
 export async function getTeams() {
-    const teamCol = collection(db, "teams")
-    const teamSnapshot = await getDocs(teamCol)
+    const teamSnapshot = await getDocs(
+        collection(db, "teams")
+    )
     const teamList = teamSnapshot.docs.map(
-        doc => doc.id
+        doc => ({
+            ref: doc.id,
+            ...doc.data()
+        })
     )
 
     return teamList
@@ -118,10 +105,3 @@ export async function acceptTeam(ref: string) {
     )
 
 }
-
-
-getTeams().then(
-    res => console.log(res)
-).finally(
-    () => console.log("finished")
-)

@@ -1,15 +1,18 @@
 import * as crypto from 'crypto'
+import env from "dotenv"
+
+
 
 const MIN = 10
 
-export function generateId(bytes: number = 24): string {
+export function generateId(): string {
+    env.config()
+    const ID_LENGTH = parseInt(process.env.ID_LENGTH!)
     
-    let result = ""
-    crypto.getRandomValues(new Uint8Array(bytes))
-        .forEach(
-            byte => result += byte.toString(16)
+    return crypto.getRandomValues(new Uint8Array(ID_LENGTH))
+        .reduce(
+            (result, byte) => result += byte.toString(16), ""
         )
-    return result
 }
 
 export function checkEmail(email: string): boolean{
