@@ -1,5 +1,5 @@
 {
-  "name": "firebase-nodejs",
+  "name": "brainx-comp-api",
   "version": "1.0.0",
   "description": "",
   "main": "src/server.ts",
@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "SAHTANI Mohcine",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.20.2",

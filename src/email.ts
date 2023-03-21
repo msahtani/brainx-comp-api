@@ -5,7 +5,7 @@ import env from "dotenv"
 env.config()
 
 export default function send(
-    _to:       string|string[],
+    _to:       string | string[],
     _message:  string,
     _subject?: string,
 ){

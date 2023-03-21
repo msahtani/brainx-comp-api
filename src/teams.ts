@@ -1,15 +1,14 @@
-import { db } from "./firebase_r"
-import sendMail from "./email"
+import { db }        from "./firebase_r"
+import sendMail      from "./email"
 import { 
     collection, 
     doc, 
-    getDoc, 
-    getDocs, 
-    setDoc,
-    updateDoc 
-} from "firebase/firestore"
-import { generateId } from "./utils"
-import * as check from './utils'
+    getDoc,             
+    getDocs,            
+    setDoc,             
+    updateDoc }       from "firebase/firestore"
+import { randomUUID } from 'crypto'
+import * as check     from './utils'
 
 
 enum TShirtSize {
@@ -65,7 +64,10 @@ export async function addTeam(team: Team){
     // assign the default value `false` to the `accepted` attribute
     team.accepted = false
 
-    const docRef = doc(db, "teams", generateId())
+    const docRef = doc(
+        db, "teams", 
+        randomUUID({disableEntropyCache: true})
+    )
     setDoc(docRef, team).then(
         _ => {
             sendMail(

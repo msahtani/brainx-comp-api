@@ -8,7 +8,6 @@ import cors from "cors";
 import morgan from "morgan";
 import { acceptTeam, addTeam, getTeams, Team} from "./teams";
 
-// Loads .env file contents into process.env.
 env.config()
 
 const app = express()
@@ -126,5 +125,3 @@ app.listen(PORT, () => {
         `server started at http://localhost:${PORT}/`
     )
 })
-
-
